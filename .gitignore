@@ -30,7 +30,6 @@ media/underscore-min.map
 *.class
 
 # generated files
-bin/
 gen/
 proguard/
 
