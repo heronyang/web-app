@@ -78,3 +78,135 @@ add the following two lines right before </manifest>
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
+**scr/java/com.example.webapp/MainActivity**
+replace all the code in class MainActivity, and press ‘OK’ when Android Studio ask the to select classes to import (select all). There may be errors since AndroidAPIsForJavascript is not created yet.
+```java
+static final boolean DEVELOPING_MOBILE_WEB_UI = false;
+static final String DEVEL_SERVER = "http://192.168.0.110:8080"; // modify it!
+
+static final String LOG_TAG = "WebApp";
+
+public WebView wv;
+private AndroidAPIsForJavascript android_js;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    setContentView(R.layout.activity_main);
+
+    this.wv = (WebView) findViewById(R.id.webView);
+    overrideLinkOpening();
+    wv.getSettings().setJavaScriptEnabled(true);
+    exposeJavascriptAPI();
+    logJavascriptConsoleAPI();
+    disableScrolling();
+
+    String url;
+    if (DEVELOPING_MOBILE_WEB_UI) {
+        //            url = DEVEL_SERVER + "/recommendations";
+        url = DEVEL_SERVER;
+    } else {
+        url = "file:///android_asset/index.html";
+    }
+    wv.loadUrl(url);
+}
+
+private void overrideLinkOpening() {
+    // Control which links open in the system browser
+    // related: onKeyDown overrides back button navigation
+    this.wv.setWebViewClient(new PlateWebViewClient());
+}
+
+private class PlateWebViewClient extends WebViewClient {
+    @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (Uri.parse(url).getScheme().equals("file")) {
+                return false;
+            } else {
+                // Otherwise, the link is not for a page on my site, so launch another Activity that handles URLs
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+                return true;
+            }
+        }
+}
+
+@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if ((keyCode == KeyEvent.KEYCODE_BACK) && this.wv.canGoBack()) {
+        Log.i(LOG_TAG, "goBack: " + this.wv.getUrl());
+        this.wv.goBack();
+        return true;
+    }
+    // If it wasn't the Back key or there's no web page history, bubble up to the default
+    // system behavior (probably exit the activity)
+    return super.onKeyDown(keyCode, event);
+}
+
+private void exposeJavascriptAPI() {
+    // Expose "AndroidAPIsForJavascript" under the name "Android"
+    if (this.android_js == null)
+        this.android_js = new AndroidAPIsForJavascript(this);
+    this.wv.addJavascriptInterface(this.android_js, "Android");
+}
+
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.main, menu);
+    return true;
+}
+
+private void logJavascriptConsoleAPI() {
+    this.wv.setWebChromeClient(new WebChromeClient() {
+            public boolean onConsoleMessage(ConsoleMessage cm) {
+            Log.d(LOG_TAG, cm.message() + " -- From line "
+                + cm.lineNumber() + " of "
+                + cm.sourceId() );
+            return true;
+            }
+            });
+}
+
+private void disableScrolling() {
+    // don't draw scroll bars
+    this.wv.setHorizontalScrollBarEnabled(false);
+    this.wv.setVerticalScrollBarEnabled(false);
+    // NOTE: content may still scroll if over sized
+}
+```
+**create new class**
+* right click on java/com.example.webapp
+* create new classes with name AndroidAPIsForJavascript
+* paste the following code in AndroidAPIsForJavascript class, and press ‘OK’ when Android Studio ask the things to import
+```java
+private static final String TAG = MainActivity.LOG_TAG;
+MainActivity activity;
+Context ctx;
+
+AndroidAPIsForJavascript(MainActivity a) {
+    this.activity = a;
+    this.ctx = a.getApplication();
+}
+
+@JavascriptInterface
+public String getPhoneNumber() {
+    // requires android.permission.READ_PHONE_STATE
+    // NOTE: may return null or ""
+    TelephonyManager tm = (TelephonyManager)ctx.getSystemService(Context.TELEPHONY_SERVICE);
+    String t =  tm.getLine1Number();
+    return t;
+}
+
+@JavascriptInterface
+public void test() {
+    Log.v(TAG, "test");
+}
+```
+**link with app websites**
+`cd WebAppProject/WebApp/src/main & ln -s ../../../../media/ assets`
+
+**Run**
+run in Android Studio
