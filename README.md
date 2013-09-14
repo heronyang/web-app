@@ -180,10 +180,12 @@ private void disableScrolling() {
     // NOTE: content may still scroll if over sized
 }
 ```
+
 **create new class**
 * right click on java/com.example.webapp
 * create new classes with name AndroidAPIsForJavascript
 * paste the following code in AndroidAPIsForJavascript class, and press ‘OK’ when Android Studio ask the things to import
+
 ```java
 private static final String TAG = MainActivity.LOG_TAG;
 MainActivity activity;
@@ -208,6 +210,7 @@ public void test() {
     Log.v(TAG, "test");
 }
 ```
+
 **link with app websites**
 `cd WebAppProject/WebApp/src/main & ln -s ../../../../media/ assets`
 
