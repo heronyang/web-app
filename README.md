@@ -214,5 +214,5 @@ public void test() {
 **link with app websites**
 `cd WebAppProject/WebApp/src/main & ln -s ../../../../media/ assets`
 
-**Run**
+**run**
 run in Android Studio
