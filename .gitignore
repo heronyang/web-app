@@ -1,0 +1,55 @@
+#
+.git/
+
+# javascript libararies
+.fetched
+backbone
+jquery-fastbutton
+jQuery-Mobile-Events
+JSON-js
+underscore
+media/backbone-min.js
+media/jquery-*.min.js
+media/jquery-fastbutton.js
+media/jquery.mobile-events.min.js
+media/json2.js
+media/underscore-min.js
+media/backbone-min.map
+media/jquery-2.0.3.min.map
+media/underscore-min.map
+
+# Android
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+proguard/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.classpath
+.project
+
+# Android Studio
+.idea/
+.gradle
+local.properties
+out/
+build/
+production/
+*.iml
+*.iws
+*.ipr
+*~
+*.swp

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <style>
+	/*
+	Original Design {
+		#FFCC66, #336699
+	}
+
+	tab bar icon size: 64x50 pixels
+	*/
+
+	html, body {
+		/* disable text selection on long tap */
+		/* webkit prefix necessary as of Android 4.3 */
+		user-select: none;
+		-webkit-user-select: none;
+		height: 100%;
+		padding: 0;
+		margin 0;
+	}
+	body {
+		background: #FFCC66;
+		/* prevents horizontal scrolling */
+		margin: 0 0;
+	}
+
+	body > div#content {
+		top: 0;
+		height: calc(100% - 52px);
+		border: solid blue 0px;
+	}
+
+	div.heading-div {
+		background: #336699;
+		margin: 0 auto;
+		padding: 0 0;
+		width: 100%;
+		height: 52px;
+		overflow: hidden;
+	}
+	div.heading-div > span {
+		margin: 0 auto;
+		display: block;
+		vertical-align: middle;
+		color: #FFCC66;
+		text-align: center;
+		font-size: 250%;
+	}
+	div#message {
+		font-size: 200%;
+		text-align: center;
+		margin-top: 50px;
+	}
+	body > ul#tab-bar {
+		top: 100%;
+		position: absolute;
+		width: 100%;
+		height: 52px;
+		margin-top: -52px;
+		padding: 0px;
+		background: #336699 repeat-x top center;
+		overflow: hidden;
+		z-index: 99;
+	}
+
+	body > ul#tab-bar > li {
+		display: inline;
+		float: left;
+		width: 20%; /* 1 / number-of-buttons */
+		height: 50px;
+		padding: 0px;
+		list-style-type: none;
+		text-align: center;
+		border: 0px;
+	}
+	body > ul#tab-bar > li > a {
+		display: block;
+		width: 60px;
+		height: 50px;
+		margin: 0 auto;
+		padding 0;
+		/* prevent tab-bar buttons (i.e. links) turning blue on clicks */
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);	
+		background-repeat: no-repeat;
+	}
+	/* FIMXE: use an icon stripe and background-position for each pair of icons */
+	body > ul#tab-bar > li > a#recommendations-btn:not(.active) {
+		background-image: url(tab-bar-icons/tabBar01.png);
+	}
+	body > ul#tab-bar > li > a#recommendations-btn.active {
+		background-image: url(tab-bar-icons/selected_tabBar01.png);
+	}
+	body > ul#tab-bar > li > a#restaurants-btn:not(.active) {
+		background-image: url(tab-bar-icons/tabBar02.png);
+	}
+	body > ul#tab-bar > li > a#restaurants-btn.active {
+		background-image: url(tab-bar-icons/selected_tabBar02.png);
+	}
+	body > ul#tab-bar > li > a#orders-btn:not(.active) {
+		background-image: url(tab-bar-icons/tabBar03.png);
+	}
+	body > ul#tab-bar > li > a#orders-btn.active {
+		background-image: url(tab-bar-icons/selected_tabBar03.png);
+	}
+	body > ul#tab-bar > li > a#social-btn:not(.active) {
+		background-image: url(tab-bar-icons/tabBar04.png);
+	}
+	body > ul#tab-bar > li > a#social-btn.active {
+		background-image: url(tab-bar-icons/selected_tabBar04.png);
+	}
+	body > ul#tab-bar > li > a#settings-btn:not(.active) {
+		background-image: url(tab-bar-icons/tabBar05.png);
+	}
+	body > ul#tab-bar > li > a#settings-btn.active {
+		background-image: url(tab-bar-icons/selected_tabBar05.png);
+	}
+    </style>
+    <title>Plate.tw</title>
+    <script src="jquery-2.0.3.min.js"></script>
+    <script src="underscore-min.js"</script>
+    <script src="json2.js"</script>
+    <script src="backbone-min.js"></script>
+    <script src="jquery-fastbutton.js"></script>
+    <script src="jquery.mobile-events.min.js"></script>
+    <script>
+    (function ($) {
+	    "use strict";
+
+	    var Plate = {};
+	    var self = Plate;
+
+	    self.webViewResize = function() {
+		    /* simulate CSS3 "height: calc(100% - 52px)" for Android 4.3 WebView */
+		    console.log('Plate.webViewResize');
+		    $('#content').css('height', '100%').css('height', '-=52px');
+	    };
+
+	    self.TabPage = Backbone.View.extend({
+		    initialize: function(options) {
+			    this.name = options.tabName;
+			    this.index = options.tabIndex;
+			    this.container = options.tabContainer;
+			    this.heading = $('#heading');
+		    },
+		    activate: function() {
+			    /* Called from URL router */
+			    var tabs = this.container;
+			    var link = tabs.links[this.index];
+			    var i;
+			    $(link).addClass('active');
+			    for (i=0; i<tabs.links.length; i++) {
+				    var t = tabs.links[i];
+				    if (t === link) {
+					    continue;
+				    }
+				    $(t).removeClass('active');
+			    }
+			    tabs.tabIndex = this.index;
+			    this.heading.text($(link).attr('title'));
+
+			    /* NOTE: demo purposes only,
+			    each tab should probably have its own separate content */
+			    Plate.messageAppend('');
+		    },
+	    });
+	    self.RecommendationsTab = self.TabPage.extend({
+		    activate: function() {
+			    var n;
+			    self.TabPage.prototype.activate.call(this);
+
+			    if (window.Android === undefined) {
+				    n = '(無法讀取)';
+			    } else {
+				    n = window.Android.getPhoneNumber();
+				    if (n === '') {
+					    n = '(無法讀取)';
+				    }
+			    }
+			    /* NOTE: demo purposes only,
+			    each tab should probably have its own separate content */
+			    Plate.messageAppend('手機號碼: ' + String(n));
+            },
+	    });
+	    self.TabsView = Backbone.View.extend({
+		    /* TabView contains TabPage's */
+		    initialize: function() {
+			    /* precondition: document ready */
+			    var i, href, page, ls, proto;
+			    this.tabBar = $('#tab-bar');
+			    this.tabBar.bind('tab', function(e) {
+				    e.stopPropagation();
+			    });
+			    ls = $('li a', this.tabBar);
+			    this.links = ls;
+			    this.tabIndex = -1;
+			    this.pages = [];
+			    this.pageByName = {};
+			    for (i=0; i<ls.length; i++) {
+				    href = $(ls[i]).attr('href');
+				    if (href === 'recommendations') {
+					    proto = self.RecommendationsTab;
+				    } else {
+					    proto = self.TabPage;
+				    }
+
+				    page = new proto({
+					    tabName: href,
+					    tabIndex: i,
+					    tabContainer: this,
+				    });
+				    this.pages.push(page);
+				    this.pageByName[href] = page;
+			    }
+			    ls.fastButton(this.onTabLinkClick);
+			    ls.click(this.onTabLinkClick);
+
+			    var content= $('#content');
+			    self.content = content;
+			    content.swipeleft(function() {
+				    Plate.messageAppend('swipe left');
+			    });
+			    content.swiperight(function() {
+				    Plate.messageAppend('swipe right');
+			    });
+			    content.taphold(function() {
+				    Plate.messageAppend('tap hold');
+			    });
+			    content.doubletap(function() {
+				    Plate.messageAppend('Reloading ...');
+			        setTimeout(function() { location.reload(); }, 50);
+			    });
+			    self.messageDiv = $('div#message');
+			    Plate.messageAppend = function(msg) {
+				    Plate.messageDiv.empty().append('<span>' + msg + '</span>');
+			    };
+		    },
+		    onTabLinkClick: function(e) {
+			    var href = $(e.target).attr('href');
+			    Plate.tabs.pageByName[href].activate();
+			    Backbone.history.navigate(href);
+			    e.preventDefault();
+			    e.stopPropagation();
+		    },
+	    });
+	    self.documentReady = function() {
+		    var routerOptions = {
+			    routes: {
+				    '': 'defaultRoute',
+				    '*tabName': 'gotoTab',
+			    },
+			    defaultRoute: function() {
+				    console.log('Default Route');
+				    Backbone.history.navigate('recommendations', { trigger: true });
+			    },
+			    gotoTab: function(tabName) {
+				    var p = Plate.tabs.pageByName[tabName];
+				    if (p === undefined) {
+					    console.log('error: unknown tab: ', tabName);
+					    p = Plate.tabs.pages[0];
+				    }
+				    p.activate();
+			    },
+		    };
+		    /* FIXME: expensize relayout */
+		    self.webViewResize();
+		    self.tabs = new Plate.TabsView();
+		    self.Router = Backbone.Router.extend(routerOptions);
+		    self.router = new self.Router();
+		    Backbone.history.start({pushState: false});
+
+		    $(window).resize(self.webViewResize);
+	    };
+	    $(self.documentReady);
+	    window.Plate = Plate;
+    })(jQuery);
+    </script>
+</head>
+<body>
+<div id="content">
+	<div class="heading-div">
+		<span id="heading"></span>
+	</div>
+	<div id="message">
+	</div>
+</div>
+<ul id="tab-bar">
+	<li><a href="recommendations" id="recommendations-btn" title="推薦餐點"></a></li>
+	<li><a href="restaurants" id="restaurants-btn" title="餐廳列表"></a></li>
+	<li><a href="orders" id="orders-btn" title="訂餐"></a></li>
+	<li><a href="social" id="social-btn" title="社交網路"></a></li>
+	<li><a href="settings" id="settings-btn" title="設定"></a></li>
+</ul>
+</body>
+</html>
