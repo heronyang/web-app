@@ -53,7 +53,7 @@ If the default Android Project doesn't match your expectation or not running wel
 * `cd web-app && make`
 * open Android Studio
 * **File** -> **New Project**
-![ScreenShot](https://lh5.googleusercontent.com/-R6c_gzAVNDY/UjSrQF6sleI/AAAAAAAAJbY/YC4PJxX7yHU/w847-h716-no/Screen+Shot+2013-09-14+at+10.02.00+PM.png)
+![ScreenShot](https://raw.github.com/heronyang/web-app/master/screenshot/screenshot.png)
 * **Next** -> **Next** -> **Finish** Do any changes if needed.
 * modify code
 **src/main/layout/activity_main.xml**
