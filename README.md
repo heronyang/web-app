@@ -65,6 +65,7 @@ android:layout_height="wrap_content"
 android:text="@string/hello_world" />
 ```
 with
+
 ```xml
 <WebView
 android:id="@+id/webView"
@@ -74,12 +75,14 @@ android:layout_alignParentRight="false"/>
 ```
 **src/main/AndroidManifest.xml**
 add the following two lines right before </manifest>
+
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
 **scr/java/com.example.webapp/MainActivity**
 replace all the code in class MainActivity, and press ‘OK’ when Android Studio ask the to select classes to import (select all). There may be errors since AndroidAPIsForJavascript is not created yet.
+
 ```java
 static final boolean DEVELOPING_MOBILE_WEB_UI = false;
 static final String DEVEL_SERVER = "http://192.168.0.110:8080"; // modify it!
